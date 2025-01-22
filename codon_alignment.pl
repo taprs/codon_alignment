@@ -7,7 +7,7 @@ die "perl $0 [cds fas] [codon table id] [minimum coverage]\n Aligning codon base
 
 Features:
 * Performing codon alignment for input CDS sequences
-* Multiple alignment with MUSCLE (binary of MUSCLE should be added to current directory)
+* Multiple alignment with mafft-linsi (should be in PATH)
 * Customized the threshold for the percentage of non-gap basepairs in a multiple sequence alignment (sequence with lower percentage of non-gap basepairs will be removed)
 * Two codon tables supported:
         1 - for The Standard Code;
@@ -91,8 +91,8 @@ close OT1;
 
 print "Step 1 of 6: nt to aa translation finished\n";
 
-`$Bin/muscle -in $ARGV[0].pep -out $ARGV[0].pep.aln -quiet`;							# Run MUSCLE alignment
-print "Step 2 of 6: aa MUSCLE alignment finished\n";
+`mafft-linsi --quiet $ARGV[0].pep > $ARGV[0].pep.aln`;							# Run MAFFT alignment
+print "Step 2 of 6: aa MAFFT alignment finished\n";
 
 system("perl $Bin/final_cleanup.pl $ARGV[0].pep.aln $ARGV[2]");							# Calculate the percentage of gaps for each sequence
 print "Step 3 of 6: cleanup aa finished $ARGV[0].pep.aln.cleanup. Coverage of all sequences: $ARGV[0].pep.aln.cleanup.log\n";
@@ -100,7 +100,7 @@ print "Step 3 of 6: cleanup aa finished $ARGV[0].pep.aln.cleanup. Coverage of al
 system("perl $Bin/find_seq_through_namelist.pl $ARGV[0] $ARGV[0].pep.aln.cleanup.list $ARGV[0].cleanup");	# Pick sequences match the criteria
 print "Step 4 of 6: cleanup nt finished $ARGV[0].cleanup\n";
 
-`$Bin/muscle -in $ARGV[0].pep.aln.cleanup -out $ARGV[0].pep.aln.cleanup.aln -quiet`;				# After removing sequences don't meet the criteria, sequences are aligned again
+`mafft-linsi --quiet $ARGV[0].pep.aln.cleanup > $ARGV[0].pep.aln.cleanup.aln`;				# After removing sequences don't meet the criteria, sequences are aligned again
 print "Step 5 of 6: second-round aa alignment finished $ARGV[0].pep.aln.cleanup\n";
 
 open (AA, "$ARGV[0].pep.aln.cleanup.aln") or die "$ARGV[0].pep.aln.cleanup.aln $!\n";
